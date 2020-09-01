@@ -1,0 +1,29 @@
+language: ruby
+rvm:
+  - 2.7.0
+  - 2.7.1
+gemfile:
+  - Gemfile
+branches:
+  only:
+    - main
+    - /gh(?:\d)+(?:-.+)?/
+    - /dev_ver_\d+\.\d+/
+env:
+  global:
+    # CC_TEST_REPORTER_ID for reporting test coverage to code climate
+    - secure: "UxO1sKG9yG/edFKuREZN/pXoHAsZ5OO8WG8/l5nMAHpikbhROxwDXVUZSJVPGrs30p/9an0rkYbwW6viWCVmM+yXNGPE6TrovO9NIxvGMBfG8oIy2iiWW9QC8Ld/Gf9J6+rQ8LWSHPd7vr13O324w7bM/ilsXgz23yA1uyXqTeyrKwogOLw9KjcrZ63s2lnRKyA/ojEsu8XSOoVW0X1vacXykNDVNgXHTRuuJ1fibDmfdaSFyh95Py6pk5Dc7KgorJpuYUbJgKU62dHyPPTX/1ePbV22Q7vWi5jK+gtRRNQXI+Lp4LwCvoLFyV87Oc2LMYY2E27NoYbKOqBxKjGiwJBI2dYGyiQT92dmXho84pMvph/8uLRkparDekt5wBUjr2Mt3UOWo0JgOzwX2X9JS8XCB6MECeUtaEdgoAljge62t7Aimvsb7Ry+Gh+qk28S2AMoQJvomnVOZ8Bb20uCAkIp8swlA8Yx7+3AtvrEwMXT6rWpxHvtsdW1nAXahh/q8QJ54Vet0bRvKxn8dEBDUlsueztCaq9LUfW3CHYEEPXoxTXKXYnoc6ZpUUs6tmgqnqwUvk54KoKjdfW2gDty6RazkMSNx4LX8KXk4h0wvgxdq37+qVBxM08jJRT56qYZ05VHJJlrhogGsW6Z0fV3vF/QWGDAtPdbQRDmkh8k4wY="
+before_install: gem update bundler
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter && chmod +x ./cc-test-reporter && ./cc-test-reporter before-build
+script:
+  - if [[ $(echo $TRAVIS_JOB_NUMBER | awk -F . '{ print $2 }') == '1' ]]; then bundle exec rubocop; fi
+  - bundle exec rspec
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+notifications:
+  slack:
+    on_success: always
+    on_failure: always
+    rooms:
+    - secure: "UfQN2gC71tsUKdam+2dVgu+bfpHgFbZ5cyMzKsAkS+AGOFx/3fuKpIyNuSbOZ5nsctWGCTxM8RK1uGgNQ7GTVA+xlYy4fDQ1LzC5qEbSe3L4PZNhGUlA9lSP3czZDtsyH7+c9bG2j2fuZjAyn4PgRMFDScXYft7tjrnwp+njWIfnkFOcXWZvVe5oenO3NYDofGeqxoFtHbp6Ud+MxcQun+0XJOyjzPQNOZTGFXocAA5PSAlmuNqB5U85C2SHxrf3vxGr15MkiXEteW5AcDB+A7baxkEuG+3zYd54bQFkYy99ENa6PAcJRWQegSarjN36LPa0Ehf/Ubj2YoFEJ2zZ1jgKz8NS6EV/KeB3YTBUFLtbH7TyT/sZHKtP3u84vuTVoayXqfPz3ZIRKNrfgg++lz0KMb5FrG9NuNraoaqPpfbetBQlPXGmYq7wQ1R5W/YYMbbWdBWJ5Jq5uXwDRvOKyNfaHnqCXgTpDY8XCA7skpBxkKWJC7E6+L+Fg4I0A7xO0dEq8o5qi8u5kiSWiCkiABhiA3qDZVfx0+K6CvuIZL5W3j6LZnXdkWbAJFQxOKWoj9dZNdxmPHUuT9QyOFXtZRVs6jAezv/aS5Oqy2vyKPCx45K3PtZYKqGYtU+bH6ORAs4S5Oal5yKJbS0G9ZM0j8GXnYEWN/VwkuBIF7xAdgE="
